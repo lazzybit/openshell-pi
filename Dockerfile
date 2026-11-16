@@ -17,8 +17,9 @@ RUN apt-get update \
 WORKDIR /opt/pi
 COPY package.json package-lock.json ./
 RUN npm ci --ignore-scripts --omit=dev --include=optional --no-fund --no-audit --progress=false \
-    && npm cache clean --force \
-    && ln -s /opt/pi/node_modules/.bin/pi /usr/local/bin/pi
+    && npm cache clean --force
+COPY models.json /opt/pi/models.json
+COPY --chmod=0755 pi /usr/local/bin/pi
 
 RUN groupadd --gid 1000 agent \
     && useradd --uid 1000 --gid agent --create-home --shell /bin/bash agent \
@@ -26,7 +27,7 @@ RUN groupadd --gid 1000 agent \
     && chown agent:agent /sandbox
 
 ENV HOME=/home/agent \
-    PI_CODING_AGENT_DIR=/tmp/pi \
+    PI_CODING_AGENT_DIR=/sandbox/.pi/agent \
     PI_SKIP_VERSION_CHECK=1
 
 USER agent

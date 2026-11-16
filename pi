@@ -1,0 +1,7 @@
+#!/bin/sh
+set -eu
+export PI_CODING_AGENT_DIR="${PI_CODING_AGENT_DIR:-/sandbox/.pi/agent}"
+mkdir -p "$PI_CODING_AGENT_DIR"
+# The image owns model metadata; persistent sessions/auth remain untouched.
+cp /opt/pi/models.json "$PI_CODING_AGENT_DIR/models.json"
+exec /opt/pi/node_modules/.bin/pi "$@"

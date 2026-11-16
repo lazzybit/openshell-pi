@@ -1,0 +1,51 @@
+{
+  "providers": {
+    "agentgateway": {
+      "baseUrl": "http://api.agentgateway.svc.cluster.local/v1",
+      "api": "openai-completions",
+      "apiKey": "mesh-identity-not-a-secret",
+      "models": [
+        {
+          "id": "openai/gpt-6.1-sol",
+          "name": "GPT-6.1 Sol",
+          "reasoning": true,
+          "input": [
+            "text",
+            "image"
+          ],
+          "contextWindow": 1050000,
+          "maxTokens": 128000,
+          "cost": {
+            "input": 2,
+            "output": 10,
+            "cacheRead": 0.1,
+            "cacheWrite": 2.5
+          },
+          "compat": {
+            "supportsTemperature": false
+          }
+        },
+        {
+          "id": "openai/gpt-6-astra",
+          "name": "GPT-6 Astra",
+          "reasoning": true,
+          "input": [
+            "text",
+            "image"
+          ],
+          "contextWindow": 1050000,
+          "maxTokens": 128000,
+          "cost": {
+            "input": 10,
+            "output": 50,
+            "cacheRead": 1,
+            "cacheWrite": 12.5
+          },
+          "compat": {
+            "supportsTemperature": false
+          }
+        }
+      ]
+    }
+  }
+}
