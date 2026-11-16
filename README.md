@@ -1,43 +1,43 @@
 # OpenShell Pi workload
 
-Minimal Pi image based on debian:trixie-slim, using Debian nodejs and npm.
-Runs as agent (UID/GID 1000), with /sandbox as the working directory.
+Debian trixie-slim, Node 22 and Pi 1.5.2, running as agent (1000).
+The root package.json and package-lock.json are unchanged official installer
+artifacts from https://pi.dev/api/installer/releases/1.5.2/ . Builds use npm ci.
+Update both manifests together to upgrade Pi; no update script or version ARG.
 
-The root package.json and package-lock.json are downloaded unchanged from the
-Pi 1.5.2 official managed installer artifacts:
+## Layout
 
-- https://pi.dev/api/installer/releases/1.5.2/package.json
-- https://pi.dev/api/installer/releases/1.5.2/package-lock.json
+- /opt/pi: Pi and npm dependencies.
+- /opt/config: image defaults from config/.
+- /opt/config/extensions/hindsight: checksum-pinned Hindsight 0.8.7 archive,
+  extracted at build time without executing its installer. index.ts exposes the
+  native Pi extension; its original dist/ and skill/ layout is retained.
+- config/skills/hindsight-coding-agent links to the bundled companion skill.
+- /sandbox/.pi/agent: persistent Pi config, sessions and logs.
 
-Docker builds copy these manifests and use npm ci, without resolving latest.
-Upgrade Pi by replacing both files with the chosen release's official artifacts.
-The manifests determine the Pi version; there is no separate PI_VERSION build arg.
-System packages follow Debian trixie repositories.
+The init entrypoint links each missing extensions/*, skills/* and top-level
+configuration file into PI_CODING_AGENT_DIR. Existing files, directories and
+symlinks (including dangling symlinks) are never replaced. It finally execs the
+requested command. /usr/local/bin/pi is the native Pi executable symlink, not a
+wrapper. No AGENTS.md is included.
 
-PI_SKIP_VERSION_CHECK=1 disables automatic version checks and update prompts.
-No provider credentials or OpenShell policy are included.
+Docker uses ENTRYPOINT init and CMD pi. OpenShell replaces the image entrypoint
+with its sandbox runtime: explicitly launch `/usr/local/bin/init pi` or
+`/usr/local/bin/init bash -i` as the sandbox command. Plain `pi` works after that
+initialization, including later execs and inside tmux. Hindsight config is also
+set through image ENV so subsequent execs use the same persistent file.
 
-The native Hindsight Pi extension `@vectorize-io/hindsight-coding-agents` 0.8.7
-is installed at build time with its published archive SHA-256 verified. The
-launcher loads the installed Pi entry point; no runtime npm downloads or MCP
-server are needed. Configuration is initialized at `$PI_CODING_AGENT_DIR/hindsight.json`
-(or set `HINDSIGHT_CONFIG` to an existing file). Session retention is enabled;
-auto-update, git seeding, codebase surveys and bank-config management are disabled.
-The internal API is `http://hindsight-api.hindsight.svc.cluster.local:8888`.
-Use an explicit `bankId` when a shared durable bank is desired.
+Only Agentgateway models openai/gpt-6.1-sol and openai/gpt-6-astra are declared.
+Metadata is from https://models.dev/api.json : reasoning, text/image input,
+128000 output tokens, base USD/million input/output/cache prices. Both contexts
+are deliberately capped at 272000 to avoid long-context pricing. Pi's schema
+cannot represent PDF inputs or tiered pricing; base cost estimates are not a
+billing guarantee. No upstream credentials are included.
 
-`models.json` is baked into `/opt/pi`. The `pi` launcher installs that image-owned
-configuration into `$PI_CODING_AGENT_DIR/models.json` on each invocation, leaving
-sessions and auth untouched. The default agent directory is `/sandbox/.pi/agent`.
-This also works when OpenShell launches `bash -i` instead of the image CMD.
+Hindsight uses the internal hindsight-api Service, automatic session retention,
+and no MCP. Auto-update, Git ingestion/seeding, surveys and bank configuration
+management are disabled. Set HINDSIGHT_CONFIG or customize the persistent config
+with an explicit bankId when a fixed bank is desired. OpenShell policy must
+allow /opt/config read-only and Node access to the model and memory endpoints.
 
-Only Agentgateway models `openai/gpt-6.1-sol` and `openai/gpt-6-astra` are declared.
-Metadata comes from the OpenAI entries in https://models.dev/api.json (2026-11-16):
-reasoning, text/image input, 128,000 output, and base USD/million token prices
-including cache reads/writes. Both models deliberately use a 272,000 context
-window (the models.dev long-context pricing threshold), rather than their
-1,050,000 advertised maximum, to keep Pi compaction below the expensive tier.
-Pi's custom-model schema cannot express PDF input or context-tier prices;
-displayed costs use the base tier, not a billing guarantee. No upstream key is included.
-
-Build with docker build -t openshell-pi:1.5.2 .
+Build: docker build -t openshell-pi:1.5.2 .
