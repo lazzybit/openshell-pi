@@ -4,4 +4,10 @@ export PI_CODING_AGENT_DIR="${PI_CODING_AGENT_DIR:-/sandbox/.pi/agent}"
 mkdir -p "$PI_CODING_AGENT_DIR"
 # The image owns model metadata; persistent sessions/auth remain untouched.
 cp /opt/pi/models.json "$PI_CODING_AGENT_DIR/models.json"
-exec /opt/pi/node_modules/.bin/pi "$@"
+export HINDSIGHT_CONFIG="${HINDSIGHT_CONFIG:-$PI_CODING_AGENT_DIR/hindsight.json}"
+if [ ! -f "$HINDSIGHT_CONFIG" ]; then
+    cp /opt/pi/hindsight.json "$HINDSIGHT_CONFIG"
+fi
+export HINDSIGHT_LOG_FILE="${HINDSIGHT_LOG_FILE:-$PI_CODING_AGENT_DIR/hindsight.log}"
+export HINDSIGHT_DIAG_FILE="${HINDSIGHT_DIAG_FILE:-$PI_CODING_AGENT_DIR/hindsight-diag.jsonl}"
+exec /opt/pi/node_modules/.bin/pi -e /opt/pi/hindsight-home/.hindsight/coding-agents/dist/pi.js "$@"
