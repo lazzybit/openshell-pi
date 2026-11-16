@@ -24,9 +24,11 @@ This also works when OpenShell launches `bash -i` instead of the image CMD.
 
 Only Agentgateway models `openai/gpt-6.1-sol` and `openai/gpt-6-astra` are declared.
 Metadata comes from the OpenAI entries in https://models.dev/api.json (2026-11-16):
-reasoning, text/image input, 1,050,000 context, 128,000 output, and base USD/million
-token prices including cache reads/writes. Pi's custom-model schema cannot express
-PDF input or models.dev's context-tier prices; displayed costs use the base tier,
-not a billing guarantee. No upstream key is included.
+reasoning, text/image input, 128,000 output, and base USD/million token prices
+including cache reads/writes. Both models deliberately use a 272,000 context
+window (the models.dev long-context pricing threshold), rather than their
+1,050,000 advertised maximum, to keep Pi compaction below the expensive tier.
+Pi's custom-model schema cannot express PDF input or context-tier prices;
+displayed costs use the base tier, not a billing guarantee. No upstream key is included.
 
 Build with docker build -t openshell-pi:1.5.2 .
