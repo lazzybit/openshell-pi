@@ -15,7 +15,16 @@ The manifests determine the Pi version; there is no separate PI_VERSION build ar
 System packages follow Debian trixie repositories.
 
 PI_SKIP_VERSION_CHECK=1 disables automatic version checks and update prompts.
-No patches, plugins, provider credentials or OpenShell policy are included.
+No provider credentials or OpenShell policy are included.
+
+The native Hindsight Pi extension `@vectorize-io/hindsight-coding-agents` 0.8.7
+is installed at build time with its published archive SHA-256 verified. The
+launcher loads the installed Pi entry point; no runtime npm downloads or MCP
+server are needed. Configuration is initialized at `$PI_CODING_AGENT_DIR/hindsight.json`
+(or set `HINDSIGHT_CONFIG` to an existing file). Session retention is enabled;
+auto-update, git seeding, codebase surveys and bank-config management are disabled.
+The internal API is `http://hindsight-api.hindsight.svc.cluster.local:8888`.
+Use an explicit `bankId` when a shared durable bank is desired.
 
 `models.json` is baked into `/opt/pi`. The `pi` launcher installs that image-owned
 configuration into `$PI_CODING_AGENT_DIR/models.json` on each invocation, leaving
