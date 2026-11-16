@@ -9,14 +9,16 @@ Update both manifests together to upgrade Pi; no update script or version ARG.
 
 - /opt/pi: Pi and npm dependencies.
 - /opt/config: image defaults from config/.
-- /opt/config/extensions/hindsight: checksum-pinned Hindsight 0.8.7 archive,
-  extracted at build time without executing its installer. index.ts exposes the
-  native Pi extension; its original dist/ and skill/ layout is retained.
-- config/skills/hindsight-coding-agent links to the bundled companion skill.
+- /opt/config/extensions/hindsight: extension-owned package.json and lockfile;
+  npm ci installs Hindsight 0.8.7 into its node_modules at build time.
+  index.ts loads the native Pi adapter; no installer or manual tar extraction.
+- init links the Hindsight companion skill directly from that npm package.
 - /sandbox/.pi/agent: persistent Pi config, sessions and logs.
 
-The init entrypoint links each missing extensions/*, skills/* and top-level
-configuration file into PI_CODING_AGENT_DIR. Existing files, directories and
+The init entrypoint explicitly lists four links: the Hindsight extension,
+its companion skill, models.json and hindsight.json. There are no loops or
+wildcard discovery. All /opt paths are read-only at runtime; installation happens
+only during image build. Existing files, directories and
 symlinks (including dangling symlinks) are never replaced. It finally execs the
 requested command. /usr/local/bin/pi is the native Pi executable symlink, not a
 wrapper. No AGENTS.md is included.

@@ -1,0 +1,8 @@
+{
+  "name": "pi-hindsight-extension",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@vectorize-io/hindsight-coding-agents": "0.8.7"
+  }
+}

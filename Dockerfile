@@ -18,13 +18,11 @@ WORKDIR /opt/pi
 COPY package.json package-lock.json ./
 RUN npm ci --ignore-scripts --omit=dev --include=optional --no-fund --no-audit --progress=false \
     && npm cache clean --force
-RUN curl -fsSL https://registry.npmjs.org/@vectorize-io/hindsight-coding-agents/-/hindsight-coding-agents-0.8.7.tgz -o /tmp/hindsight.tgz \
-    && printf '%s  %s\n' f9ad8b8c7df8c363cf05dbbfd75089424ccd54aca0cfee27ae298e28a217567d /tmp/hindsight.tgz | sha256sum -c - \
-    && mkdir -p /opt/config/extensions/hindsight \
-    && tar -xzf /tmp/hindsight.tgz --strip-components=1 -C /opt/config/extensions/hindsight \
-    && rm /tmp/hindsight.tgz \
-    && ln -s /opt/pi/node_modules/.bin/pi /usr/local/bin/pi
+RUN ln -s /opt/pi/node_modules/.bin/pi /usr/local/bin/pi
 COPY config/ /opt/config/
+RUN cd /opt/config/extensions/hindsight \
+    && npm ci --omit=dev --ignore-scripts --no-fund --no-audit --progress=false \
+    && npm cache clean --force
 COPY --chmod=0755 init /usr/local/bin/init
 
 RUN groupadd --gid 1000 agent \

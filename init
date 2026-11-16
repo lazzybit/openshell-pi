@@ -2,21 +2,20 @@
 set -eu
 export PI_CODING_AGENT_DIR="${PI_CODING_AGENT_DIR:-/sandbox/.pi/agent}"
 mkdir -p "$PI_CODING_AGENT_DIR/extensions" "$PI_CODING_AGENT_DIR/skills"
-link_missing() {
-    if [ ! -e "$2" ] && [ ! -L "$2" ]; then
-        ln -s "$1" "$2"
-    fi
-}
-for kind in extensions skills; do
-    for source in /opt/config/"$kind"/*; do
-        [ -e "$source" ] || [ -L "$source" ] || continue
-        link_missing "$source" "$PI_CODING_AGENT_DIR/$kind/$(basename "$source")"
-    done
-done
-for source in /opt/config/*; do
-    [ -f "$source" ] || continue
-    link_missing "$source" "$PI_CODING_AGENT_DIR/$(basename "$source")"
-done
+
+if [ ! -e "$PI_CODING_AGENT_DIR/extensions/hindsight" ] && [ ! -L "$PI_CODING_AGENT_DIR/extensions/hindsight" ]; then
+    ln -s /opt/config/extensions/hindsight "$PI_CODING_AGENT_DIR/extensions/hindsight"
+fi
+if [ ! -e "$PI_CODING_AGENT_DIR/skills/hindsight-coding-agent" ] && [ ! -L "$PI_CODING_AGENT_DIR/skills/hindsight-coding-agent" ]; then
+    ln -s /opt/config/extensions/hindsight/node_modules/@vectorize-io/hindsight-coding-agents/skill "$PI_CODING_AGENT_DIR/skills/hindsight-coding-agent"
+fi
+if [ ! -e "$PI_CODING_AGENT_DIR/models.json" ] && [ ! -L "$PI_CODING_AGENT_DIR/models.json" ]; then
+    ln -s /opt/config/models.json "$PI_CODING_AGENT_DIR/models.json"
+fi
+if [ ! -e "$PI_CODING_AGENT_DIR/hindsight.json" ] && [ ! -L "$PI_CODING_AGENT_DIR/hindsight.json" ]; then
+    ln -s /opt/config/hindsight.json "$PI_CODING_AGENT_DIR/hindsight.json"
+fi
+
 export HINDSIGHT_CONFIG="${HINDSIGHT_CONFIG:-$PI_CODING_AGENT_DIR/hindsight.json}"
 export HINDSIGHT_LOG_FILE="${HINDSIGHT_LOG_FILE:-$PI_CODING_AGENT_DIR/hindsight.log}"
 export HINDSIGHT_DIAG_FILE="${HINDSIGHT_DIAG_FILE:-$PI_CODING_AGENT_DIR/hindsight-diag.jsonl}"

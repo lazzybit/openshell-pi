@@ -1,1 +1,1 @@
-export { default } from "./dist/pi.js";
+export { default } from "./node_modules/@vectorize-io/hindsight-coding-agents/dist/pi.js";
