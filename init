@@ -7,7 +7,7 @@ if [ ! -e "$PI_CODING_AGENT_DIR/extensions/hindsight" ] && [ ! -L "$PI_CODING_AG
     ln -s /opt/config/extensions/hindsight "$PI_CODING_AGENT_DIR/extensions/hindsight"
 fi
 if [ ! -e "$PI_CODING_AGENT_DIR/skills/hindsight-coding-agent" ] && [ ! -L "$PI_CODING_AGENT_DIR/skills/hindsight-coding-agent" ]; then
-    ln -s /opt/config/extensions/hindsight/node_modules/@vectorize-io/hindsight-coding-agents/skill "$PI_CODING_AGENT_DIR/skills/hindsight-coding-agent"
+    ln -s /opt/config/skills/hindsight-coding-agent "$PI_CODING_AGENT_DIR/skills/hindsight-coding-agent"
 fi
 if [ ! -e "$PI_CODING_AGENT_DIR/models.json" ] && [ ! -L "$PI_CODING_AGENT_DIR/models.json" ]; then
     ln -s /opt/config/models.json "$PI_CODING_AGENT_DIR/models.json"

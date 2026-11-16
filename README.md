@@ -12,7 +12,8 @@ Update both manifests together to upgrade Pi; no update script or version ARG.
 - /opt/config/extensions/hindsight: extension-owned package.json and lockfile;
   npm ci installs Hindsight 0.8.7 into its node_modules at build time.
   index.ts loads the native Pi adapter; no installer or manual tar extraction.
-- init links the Hindsight companion skill directly from that npm package.
+- config/skills/hindsight-coding-agent links to the npm package's skill/;
+  init links this config/skills entry into the persistent Pi skills directory.
 - /sandbox/.pi/agent: persistent Pi config, sessions and logs.
 
 The init entrypoint explicitly lists four links: the Hindsight extension,
