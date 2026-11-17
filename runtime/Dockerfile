@@ -30,8 +30,7 @@ RUN groupadd --gid 1000 agent \
     && mkdir -p /sandbox \
     && chown agent:agent /sandbox
 
-ENV LANG=C.UTF-8 \
-    HOME=/home/agent \
+ENV HOME=/home/agent \
     PI_CODING_AGENT_DIR=/sandbox/.pi/agent \
     HINDSIGHT_CONFIG=/sandbox/.pi/agent/hindsight.json \
     HINDSIGHT_LOG_FILE=/sandbox/.pi/agent/hindsight.log \

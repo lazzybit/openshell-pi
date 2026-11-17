@@ -2,7 +2,7 @@
 
 Go gRPC service implementing the official OpenShell v0.1.8 Gateway Interceptor protocol. The only binding is `openshell.v1.OpenShell/CreateSandbox` in `modify_operation`, with fail-closed behavior.
 
-It preserves existing Pod annotations and forces `ambient.istio.io/dns-capture=false`. For `--template pi`, OpenShell v0.1.8 cannot combine a named workload template with inline annotations, so an operator must provide a JSON snapshot mapping approved template names to inline templates:
+It sets `spec.environment.LANG=C.UTF-8` on CreateSandbox, preserving other declared environment variables, so both initial processes and later exec sessions receive the locale. It preserves existing Pod annotations and forces `ambient.istio.io/dns-capture=false`. For `--template pi`, OpenShell v0.1.8 cannot combine a named workload template with inline annotations, so an operator must provide a JSON snapshot mapping approved template names to inline templates:
 
 ```json
 {"pi":{"image":"registry.example/pi@sha256:<approved-digest>"}}

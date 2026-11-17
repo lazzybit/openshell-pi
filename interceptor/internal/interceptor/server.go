@@ -32,7 +32,16 @@ func (s *Server) Evaluate(_ context.Context, req *pb.InterceptorEvaluation) (*pb
 	if !ok {
 		return nil, status.Error(codes.InvalidArgument, "spec is required")
 	}
-	var patches []*pb.JsonPatch
+	environment, _ := spec["environment"].(map[string]any)
+	if environment == nil {
+		environment = map[string]any{}
+	}
+	environment["LANG"] = "C.UTF-8"
+	environmentValue, err := structpb.NewValue(environment)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid environment")
+	}
+	patches := []*pb.JsonPatch{{Op: "add", Path: "/spec/environment", Value: environmentValue}}
 	if s.Policy != nil {
 		value, err := structpb.NewValue(s.Policy)
 		if err != nil {
