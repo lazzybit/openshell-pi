@@ -1,9 +1,11 @@
-FROM golang:1.24.4-bookworm AS build
+FROM --platform=$BUILDPLATFORM golang:1.24.4-bookworm AS build
+ARG TARGETOS
+ARG TARGETARCH
 WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
-RUN CGO_ENABLED=0 go build -trimpath -ldflags='-s -w' -o /out/openshell-pi-interceptor ./cmd/openshell-pi-interceptor
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -trimpath -ldflags='-s -w' -o /out/openshell-pi-interceptor ./cmd/openshell-pi-interceptor
 
 FROM debian:trixie-slim
 RUN apt-get update \
