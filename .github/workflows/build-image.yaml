@@ -1,4 +1,4 @@
-name: Build and publish Pi image
+name: Build and publish OpenShell Pi packages
 
 on:
   pull_request:
@@ -14,8 +14,24 @@ permissions:
 jobs:
   image:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - context: runtime
+            package: openshell-pi-runtime
+          - context: interceptor
+            package: openshell-pi-interceptor
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        if: matrix.context == 'interceptor'
+        with:
+          go-version-file: interceptor/go.mod
+          cache-dependency-path: interceptor/go.sum
+      - name: Test Go interceptor
+        if: matrix.context == 'interceptor'
+        working-directory: interceptor
+        run: go test ./... && go vet ./...
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
       - name: Log in to GHCR
@@ -29,7 +45,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository }}
+          images: ghcr.io/${{ github.repository_owner }}/${{ matrix.package }}
           tags: |
             type=ref,event=branch
             type=ref,event=tag
@@ -39,7 +55,7 @@ jobs:
         id: build
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: ./${{ matrix.context }}
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
