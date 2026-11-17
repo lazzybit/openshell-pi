@@ -62,7 +62,7 @@ func TestNamedTemplateExpansion(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !result.Allowed || len(result.Patches) != 3 {
+	if !result.Allowed || len(result.Patches) != 4 {
 		t.Fatalf("expected expansion, got %v", result)
 	}
 }
@@ -74,10 +74,10 @@ func TestInlineDNSPatchPreservesOtherAnnotations(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !result.Allowed || len(result.Patches) != 1 {
+	if !result.Allowed || len(result.Patches) != 2 {
 		t.Fatalf("unexpected result: %v", result)
 	}
-	annotations := result.Patches[0].Value.GetStructValue().AsMap()
+	annotations := result.Patches[1].Value.GetStructValue().AsMap()
 	if annotations["keep"] != "value" || annotations["ambient.istio.io/dns-capture"] != "false" {
 		t.Fatalf("annotations: %v", annotations)
 	}
