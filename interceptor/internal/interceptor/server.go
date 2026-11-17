@@ -13,6 +13,7 @@ import (
 type Server struct {
 	pb.UnimplementedGatewayInterceptorServer
 	Templates map[string]map[string]any
+	Policy    map[string]any
 }
 
 func (*Server) Describe(_ context.Context, req *pb.DescribeRequest) (*pb.InterceptorManifest, error) {
@@ -32,6 +33,13 @@ func (s *Server) Evaluate(_ context.Context, req *pb.InterceptorEvaluation) (*pb
 		return nil, status.Error(codes.InvalidArgument, "spec is required")
 	}
 	var patches []*pb.JsonPatch
+	if s.Policy != nil {
+		value, err := structpb.NewValue(s.Policy)
+		if err != nil {
+			return nil, status.Error(codes.Internal, "invalid deployment policy")
+		}
+		patches = append(patches, &pb.JsonPatch{Op: "add", Path: "/spec/policy", Value: value})
+	}
 	if name, ok := op["workloadTemplate"].(string); ok && name != "" {
 		configured, exists := s.Templates[name]
 		if !exists {
