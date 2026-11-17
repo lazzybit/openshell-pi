@@ -12,6 +12,22 @@ import (
 	"testing"
 )
 
+func TestRejectUnknownTemplate(t *testing.T) {
+	op, _ := structpb.NewStruct(map[string]any{"workloadTemplate": "unapproved", "spec": map[string]any{}})
+	req := &pb.InterceptorEvaluation{Service: "openshell.v1.OpenShell", Method: "CreateSandbox", Phase: &pb.InterceptorEvaluation_ModifyOperation{ModifyOperation: &pb.ModifyOperationEvaluation{ProposedOperation: op}}}
+	result, err := new(Server).Evaluate(context.Background(), req)
+	if err != nil || result.GetAllowed() || len(result.GetPatches()) != 0 {
+		t.Fatalf("unexpected result %v %v", result, err)
+	}
+}
+
+func TestRejectWrongRPC(t *testing.T) {
+	_, err := new(Server).Evaluate(context.Background(), &pb.InterceptorEvaluation{Service: "other", Method: "CreateSandbox"})
+	if err == nil {
+		t.Fatal("wrong RPC accepted")
+	}
+}
+
 func TestGRPCContract(t *testing.T) {
 	listener := bufconn.Listen(1048576)
 	server := grpc.NewServer()
